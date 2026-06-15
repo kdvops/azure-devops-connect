@@ -1,0 +1,13 @@
+{
+  "name": "azure-devops-connect",
+  "version": "1.0.0",
+  "description": "Jira Forge App - Azure DevOps Connect",
+  "main": "src/index.js",
+  "dependencies": {
+    "@forge/api": "^3.0.0",
+    "@forge/resolver": "^1.6.0"
+  },
+  "devDependencies": {
+    "@forge/cli": "^10.0.0"
+  }
+}
