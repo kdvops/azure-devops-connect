@@ -1,13 +1,19 @@
 {
   "name": "azure-devops-connect",
   "version": "1.0.0",
-  "description": "Jira Forge App - Azure DevOps Connect",
-  "main": "src/index.js",
+  "description": "Jira Forge app to connect Jira issues with Azure DevOps branches",
+  "main": "src/index.jsx",
+  "forge": {
+    "runtime": "nodejs18"
+  },
   "dependencies": {
     "@forge/api": "^3.0.0",
-    "@forge/resolver": "^1.6.0"
+    "@forge/ui": "^1.0.0"
   },
-  "devDependencies": {
-    "@forge/cli": "^10.0.0"
+  "devDependencies": {},
+  "scripts": {
+    "deploy": "forge deploy",
+    "install": "forge install",
+    "lint": "eslint src/"
   }
 }
