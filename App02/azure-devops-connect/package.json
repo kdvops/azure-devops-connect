@@ -1,0 +1,43 @@
+{
+  "name": "azure-devops-connect",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Jira Forge app for managing Azure DevOps branches from Jira issues.",
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "scripts": {
+    "build": "node ./scripts/build-frontend.mjs && tsc -p tsconfig.json",
+    "build:frontend": "node ./scripts/build-frontend.mjs",
+    "lint": "eslint src tests vitest.config.ts eslint.config.js",
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "test": "vitest run --coverage",
+    "test:unit": "vitest run --coverage",
+    "test:integration": "vitest run tests/integration --passWithNoTests",
+    "test:contract": "vitest run tests/contract --passWithNoTests",
+    "forge:lint": "forge lint",
+    "forge": "forge lint"
+  },
+  "dependencies": {
+    "@forge/api": "^5.1.0",
+    "@forge/bridge": "^4.5.0",
+    "@forge/resolver": "^1.7.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.29.0",
+    "@forge/cli": "^12.22.0",
+    "@types/node": "^22.15.31",
+    "@types/react": "^18.3.23",
+    "@types/react-dom": "^18.3.7",
+    "@typescript-eslint/eslint-plugin": "^8.35.1",
+    "@typescript-eslint/parser": "^8.35.1",
+    "@vitest/coverage-v8": "^3.2.4",
+    "esbuild": "^0.25.5",
+    "eslint": "^9.29.0",
+    "globals": "^16.2.0",
+    "typescript": "^5.8.3",
+    "vitest": "^3.2.4"
+  }
+}

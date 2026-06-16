@@ -1,0 +1,44 @@
+app:
+  id: ari:cloud:ecosystem::app/1ed92a6b-7251-49c4-af02-bd818327b356
+  runtime:
+    name: nodejs22.x
+
+modules:
+  jira:issuePanel:
+    - key: azure-devops-connect-issue-panel
+      resource: main
+      resolver:
+        function: resolver
+      title: Azure DevOps Branch
+      viewportSize: medium
+      icon: https://developer.atlassian.com/platform/forge/images/issue-panel-icon.svg
+  jira:adminPage:
+    - key: azure-devops-connect-admin-page
+      resource: main
+      resolver:
+        function: resolver
+      title: Azure DevOps Connect
+      icon: https://developer.atlassian.com/platform/forge/images/icons/issue-panel-icon.svg
+  trigger:
+    - key: issue-created-event-trigger
+      function: issue-created-trigger
+      events:
+        - avi:jira:created:issue
+  function:
+    - key: resolver
+      handler: index.handler
+    - key: issue-created-trigger
+      handler: index.issueCreatedTrigger
+resources:
+  - key: main
+    path: static/app/dist
+
+permissions:
+  scopes:
+    - read:jira-work
+    - write:jira-work
+    - storage:app
+  external:
+    fetch:
+      backend:
+        - https://dev.azure.com
