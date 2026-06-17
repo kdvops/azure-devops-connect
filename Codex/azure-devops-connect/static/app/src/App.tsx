@@ -68,7 +68,6 @@ const mappingToText = (mapping: Readonly<Record<string, string>> | undefined): s
 const IssuePanel = (): JSX.Element => {
   const [status, setStatus] = useState<BranchStatusDto | null>(null);
   const [pendingAction, setPendingAction] = useState<string | null>(null);
-  const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -85,21 +84,14 @@ const IssuePanel = (): JSX.Element => {
     });
   }, []);
 
-  const runAction = async (actionName: "create" | "retry" | "refresh"): Promise<void> => {
+  const runAction = async (actionName: "create"): Promise<void> => {
     setPendingAction(actionName);
-    setMessage(null);
     setError(null);
 
     try {
-      const result =
-        actionName === "create"
-          ? await apiClient.createBranch()
-          : actionName === "retry"
-            ? await apiClient.retryBranch()
-            : await apiClient.refreshBranch();
+      const result = await apiClient.createBranch();
 
       setStatus(result);
-      setMessage(actionName === "refresh" ? "Branch status refreshed." : "Branch operation completed.");
     } catch (caughtError: unknown) {
       const typedError = caughtError as { message?: string };
       setError(typedError.message ?? "The action could not be completed.");
@@ -112,78 +104,25 @@ const IssuePanel = (): JSX.Element => {
     <div className="shell">
       <div className="stack">
         <section className="card">
-          <div className="eyebrow">Issue Panel</div>
+          <div className="eyebrow">Issue Context</div>
           <h1 className="title">Azure DevOps Branch</h1>
-          <p className="muted">Create, refresh and inspect the branch linked to this Jira issue.</p>
-          <div className="pill" data-status={status?.status ?? "PENDING"}>
-            {status?.status ?? "Loading"}
-          </div>
+          <p className="muted">
+            {status?.branchName ? `Branch: ${status.branchName}` : "Crear rama para este issue."}
+          </p>
+          {status?.branchName ? <div className="pill" data-status={status.status}>{status.branchName}</div> : null}
         </section>
 
-        {message ? <div className="success">{message}</div> : null}
         {error ? <div className="error">{error}</div> : null}
 
-        <section className="card details">
-          <div className="detail-grid">
-            <div className="detail-item">
-              <strong>Branch</strong>
-              <span>{status?.branchName ?? "Not created yet"}</span>
+        {!status?.branchName ? (
+          <section className="card">
+            <div className="actions">
+              <button disabled={pendingAction !== null} onClick={() => void runAction("create")}>
+                {pendingAction === "create" ? "Creando..." : "Crear rama"}
+              </button>
             </div>
-            <div className="detail-item">
-              <strong>Repository</strong>
-              <span>{status?.repositoryName ?? "Not configured"}</span>
-            </div>
-            <div className="detail-item">
-              <strong>Base Branch</strong>
-              <span>{status?.baseBranch ?? "Not configured"}</span>
-            </div>
-            <div className="detail-item">
-              <strong>Last Sync</strong>
-              <span>{status?.lastSyncAt ?? "Never"}</span>
-            </div>
-          </div>
-
-          {status?.lastCommit ? (
-            <div className="detail-grid">
-              <div className="detail-item">
-                <strong>Commit</strong>
-                <span>{status.lastCommit.shortId}</span>
-              </div>
-              <div className="detail-item">
-                <strong>Author</strong>
-                <span>{status.lastCommit.author}</span>
-              </div>
-              <div className="detail-item">
-                <strong>Date</strong>
-                <span>{status.lastCommit.date}</span>
-              </div>
-              <div className="detail-item">
-                <strong>Message</strong>
-                <span>{status.lastCommit.message || "No message"}</span>
-              </div>
-            </div>
-          ) : null}
-
-          {status?.branchUrl ? (
-            <a href={status.branchUrl} target="_blank" rel="noreferrer">
-              Open in Azure DevOps
-            </a>
-          ) : null}
-        </section>
-
-        <section className="card">
-          <div className="actions">
-            <button disabled={pendingAction !== null} onClick={() => void runAction("create")}>
-              {pendingAction === "create" ? "Creating..." : "Create Branch"}
-            </button>
-            <button className="secondary" disabled={pendingAction !== null} onClick={() => void runAction("retry")}>
-              {pendingAction === "retry" ? "Retrying..." : "Retry"}
-            </button>
-            <button className="secondary" disabled={pendingAction !== null} onClick={() => void runAction("refresh")}>
-              {pendingAction === "refresh" ? "Refreshing..." : "Refresh"}
-            </button>
-          </div>
-        </section>
+          </section>
+        ) : null}
       </div>
     </div>
   );
@@ -461,7 +400,7 @@ export const App = (): JSX.Element => {
   if (!context) {
     return (
       <div className="shell">
-        <div className="card">Loading Azure DevOps Connect...</div>
+        <div className="card">Cargando Azure DevOps Branch...</div>
       </div>
     );
   }

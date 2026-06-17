@@ -1,5 +1,4 @@
 import { buildIdempotencyKey } from "../../domain/branch/idempotency";
-import { generateBranchName } from "../../domain/branch/branch-name-generator";
 import type { JiraIssueSnapshot, IssueBranchLink, OperationLog } from "../../domain/entities/models";
 import { DomainError, toDomainError } from "../../domain/errors/domain-error";
 import type { AzureDevOpsGitClientFactory } from "../ports/azure-devops-git-client";
@@ -63,15 +62,7 @@ export class CreateIssueBranchUseCase {
     }
 
     const gitClient = this.gitClientFactory.create(connection.organizationName, connection.personalAccessToken);
-    const branchName = generateBranchName({
-      issueKey: input.issue.key,
-      issueType: input.issue.issueType,
-      summary: input.issue.summary,
-      template: mapping.branchTemplate,
-      issueTypePrefixMapping: mapping.issueTypePrefixMapping,
-      maxLength: mapping.maxBranchLength,
-      lowercase: mapping.normalizeLowercase
-    });
+    const branchName = input.issue.key;
     const idempotencyKey = buildIdempotencyKey(input.installationId, input.issue.id, mapping.repositoryId, branchName);
 
     const existingByIdempotency = await this.issueBranchRepository.findByIdempotencyKey(input.installationId, idempotencyKey);

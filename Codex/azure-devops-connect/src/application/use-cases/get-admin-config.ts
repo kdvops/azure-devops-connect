@@ -1,4 +1,5 @@
 import type { AzureDevOpsConnectionRepository, ProjectMappingRepository } from "../ports/repositories";
+import type { ProjectMapping } from "../../domain/entities/models";
 import type { AdminConfigurationDto } from "./contracts";
 
 export interface GetAdminConfigurationInput {
@@ -14,9 +15,10 @@ export class GetAdminConfigurationUseCase {
 
   public async execute(input: GetAdminConfigurationInput): Promise<AdminConfigurationDto> {
     const connection = await this.connectionRepository.get(input.installationId);
-    const mapping = input.jiraProjectKey.trim()
-      ? await this.projectMappingRepository.getByJiraProjectKey(input.installationId, input.jiraProjectKey.trim())
-      : null;
+    const normalizedProjectKey = input.jiraProjectKey.trim();
+    const mapping = normalizedProjectKey
+      ? await this.projectMappingRepository.getByJiraProjectKey(input.installationId, normalizedProjectKey)
+      : await this.resolveDefaultMapping(input.installationId);
 
     return {
       connection: connection
@@ -41,5 +43,14 @@ export class GetAdminConfigurationUseCase {
           }
         : null
     };
+  }
+
+  private async resolveDefaultMapping(installationId: string): Promise<ProjectMapping | null> {
+    const mappings = await this.projectMappingRepository.listByInstallationId(installationId);
+    if (mappings.length !== 1) {
+      return null;
+    }
+
+    return mappings[0] ?? null;
   }
 }

@@ -13,6 +13,7 @@ export interface AzureDevOpsConnectionRepository {
 export interface ProjectMappingRepository {
   getByJiraProjectId(installationId: string, jiraProjectId: string): Promise<ProjectMapping | null>;
   getByJiraProjectKey(installationId: string, jiraProjectKey: string): Promise<ProjectMapping | null>;
+  listByInstallationId(installationId: string): Promise<ReadonlyArray<ProjectMapping>>;
   save(mapping: ProjectMapping): Promise<void>;
 }
 
