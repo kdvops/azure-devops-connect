@@ -136,6 +136,10 @@ const AdminPage = (): JSX.Element => {
   const [pendingAction, setPendingAction] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const connectionStatus = adminConfig?.connection?.status ?? "NOT CONNECTED";
+  const connectionSummary = adminConfig?.connection
+    ? `${adminConfig.connection.organizationName} · ${adminConfig.connection.status}`
+    : "Azure DevOps connection not configured yet";
 
   const mappingPayload = useMemo(
     () => ({
@@ -240,7 +244,7 @@ const AdminPage = (): JSX.Element => {
         <section className="card">
           <div className="eyebrow">Admin Page</div>
           <h1 className="title">Azure DevOps Connect</h1>
-          <p className="muted">Configure the shared Azure connection and the Jira-to-repository mapping for the MVP.</p>
+          <p className="muted">Connect Azure DevOps first, then map Jira projects to repositories.</p>
         </section>
 
         {message ? <div className="success">{message}</div> : null}
@@ -249,15 +253,20 @@ const AdminPage = (): JSX.Element => {
         <section className="card stack">
           <div>
             <div className="eyebrow">Connection</div>
-            <h2 className="title">Azure DevOps credentials</h2>
+            <h2 className="title">Connect Azure DevOps</h2>
+          </div>
+          <div className="pill" data-status={connectionStatus}>
+            {connectionSummary}
           </div>
           <div className="row">
             <label>
               Organization name
+              <span className="muted">For example: `my-org` from `https://dev.azure.com/my-org`.</span>
               <input value={organizationName} onChange={(event) => setOrganizationName(event.target.value)} />
             </label>
             <label>
               Personal access token
+              <span className="muted">Use the Azure DevOps PAT with repo read/write access.</span>
               <input
                 type="password"
                 value={personalAccessToken}
@@ -272,10 +281,10 @@ const AdminPage = (): JSX.Element => {
           ) : null}
           <div className="actions">
             <button disabled={pendingAction !== null} onClick={() => void saveConnection()}>
-              {pendingAction === "connection" ? "Saving..." : "Save Connection"}
+              {pendingAction === "connection" ? "Connecting..." : "Connect Azure DevOps"}
             </button>
             <button className="secondary" disabled={pendingAction !== null} onClick={() => void testConnection()}>
-              {pendingAction === "test-connection" ? "Testing..." : "Test Connection"}
+              {pendingAction === "test-connection" ? "Testing..." : "Verify Connection"}
             </button>
           </div>
         </section>
@@ -285,6 +294,7 @@ const AdminPage = (): JSX.Element => {
             <div className="eyebrow">Mapping</div>
             <h2 className="title">Jira project mapping</h2>
           </div>
+          <p className="muted">Pick a Jira project key and the Azure DevOps project/repository that should receive branches.</p>
           <div className="row">
             <label>
               Jira project key
