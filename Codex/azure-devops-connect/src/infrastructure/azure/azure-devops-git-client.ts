@@ -8,6 +8,7 @@ import type {
 import type { CommitSummary } from "../../domain/entities/models";
 import { DomainError } from "../../domain/errors/domain-error";
 import { AzureDevOpsHttpClient } from "./azure-devops-http-client";
+import { normalizeAzureDevOpsOrganizationName } from "./azure-devops-organization";
 
 interface AzureProjectsResponse {
   readonly value: ReadonlyArray<{
@@ -53,8 +54,8 @@ export class DefaultAzureDevOpsGitClient implements AzureDevOpsGitClient {
   private readonly organizationName: string;
 
   public constructor(organizationName: string, personalAccessToken: string) {
-    this.organizationName = organizationName;
-    this.httpClient = new AzureDevOpsHttpClient(organizationName, personalAccessToken);
+    this.organizationName = normalizeAzureDevOpsOrganizationName(organizationName);
+    this.httpClient = new AzureDevOpsHttpClient(this.organizationName, personalAccessToken);
   }
 
   public async testConnection(): Promise<void> {

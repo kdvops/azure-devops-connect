@@ -1,6 +1,7 @@
 import type { AzureDevOpsConnectionRepository } from "../ports/repositories";
 import type { AzureDevOpsGitClientFactory } from "../ports/azure-devops-git-client";
 import type { AzureDevOpsConnection } from "../../domain/entities/models";
+import { normalizeAzureDevOpsOrganizationName } from "../../infrastructure/azure/azure-devops-organization";
 
 export interface SaveConnectionInput {
   readonly installationId: string;
@@ -15,7 +16,7 @@ export class SaveConnectionUseCase {
   ) {}
 
   public async execute(input: SaveConnectionInput): Promise<void> {
-    const organizationName = input.organizationName.trim();
+    const organizationName = normalizeAzureDevOpsOrganizationName(input.organizationName);
     const personalAccessToken = input.personalAccessToken.trim();
     const now = new Date().toISOString();
 
