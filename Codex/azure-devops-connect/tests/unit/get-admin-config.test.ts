@@ -23,7 +23,7 @@ const createProjectMappingRepository = (
 });
 
 describe("GetAdminConfigurationUseCase", () => {
-  it("loads the single existing mapping when no Jira project key is provided", async () => {
+  it("does not guess a mapping when no Jira project key is provided", async () => {
     const useCase = new GetAdminConfigurationUseCase(
       createConnectionRepository({
         installationId: "install-1",
@@ -63,7 +63,7 @@ describe("GetAdminConfigurationUseCase", () => {
       jiraProjectKey: ""
     });
 
-    expect(result.mapping?.jiraProjectKey).toBe("ABC");
+    expect(result.mapping).toBeNull();
     expect(result.connection?.organizationName).toBe("kdvops");
   });
 
